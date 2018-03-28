@@ -120,7 +120,6 @@ public class MainActivity extends AppCompatActivity {
 
         AliPayReq2 aliPayReq = new AliPayReq2.Builder()
                 .with(activity)//Activity实例
-                .setRawAliPayOrderInfo(rawAliOrderInfo)//set the ali pay order info
                 .setSignedAliPayOrderInfo(signAliOrderInfo) //set the signed ali pay order info
                 .create()//
                 .setOnAliPayListener(null);//

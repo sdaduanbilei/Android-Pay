@@ -1,5 +1,6 @@
 package io.github.mayubao.pay_library;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.os.Handler;
 import android.os.Message;
@@ -38,6 +39,7 @@ public class AliPayReq2 {
 
 	private Handler mHandler;
 
+	@SuppressLint("HandlerLeak")
 	public AliPayReq2() {
 		super();
 		mHandler = new Handler(){
@@ -66,7 +68,7 @@ public class AliPayReq2 {
 
 						} else {
 							// 其他值就可以判断为支付失败，包括用户主动取消支付，或者系统返回的错误
-							Toast.makeText(mActivity, "支付失败", Toast.LENGTH_SHORT).show();
+							Toast.makeText(mActivity, payResult.getMemo(), Toast.LENGTH_SHORT).show();
 							if(mOnAliPayListener != null) mOnAliPayListener.onPayFailure(resultInfo);
 						}
 					}
@@ -94,19 +96,19 @@ public class AliPayReq2 {
 //		String orderInfo = getOrderInfo(this.partner,
 //				this.seller, this.outTradeNo, this.subject, this.body,
 //				this.price, this.callbackUrl);
-		String orderInfo = rawAliPayOrderInfo;
+//		String orderInfo = rawAliPayOrderInfo;
 		// 做RSA签名之后的订单信息
-		String sign = signedAliPayOrderInfo;
-		try {
-			// 仅需对sign 做URL编码
-			sign = URLEncoder.encode(sign, "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
+//		String sign = signedAliPayOrderInfo;
+//		try {
+//			 仅需对sign 做URL编码
+//			sign = URLEncoder.encode(sign, "UTF-8");
+//		} catch (UnsupportedEncodingException e) {
+//			e.printStackTrace();
+//		}
 
 		// 完整的符合支付宝参数规范的订单信息
-		final String payInfo = orderInfo + "&sign=\"" + sign + "\"&"
-				+ getSignType();
+//		final String payInfo = orderInfo + "&sign=\"" + sign + "\"&"
+//				+ getSignType();
 
 		Runnable payRunnable = new Runnable() {
 
@@ -115,7 +117,7 @@ public class AliPayReq2 {
 				// 构造PayTask 对象
 				PayTask alipay = new PayTask(mActivity);
 				// 调用支付接口，获取支付结果
-				String result = alipay.pay(payInfo);
+				String result = alipay.pay(signedAliPayOrderInfo,true);
 
 				Message msg = new Message();
 				msg.what = SDK_PAY_FLAG;
@@ -129,29 +131,6 @@ public class AliPayReq2 {
 		payThread.start();
 	}
 	
-	/**
-	 * 查询终端设备是否存在支付宝认证账户
-	 */
-	public void check(){
-		Runnable checkRunnable = new Runnable() {
-
-			@Override
-			public void run() {
-				// 构造PayTask 对象
-				PayTask payTask = new PayTask(mActivity);
-				// 调用查询接口，获取查询结果
-				boolean isExist = payTask.checkAccountIfExist();
-
-				Message msg = new Message();
-				msg.what = SDK_CHECK_FLAG;
-				msg.obj = isExist;
-				mHandler.sendMessage(msg);
-			}
-		};
-
-		Thread checkThread = new Thread(checkRunnable);
-		checkThread.start();
-	}
 
 	
 	/**
@@ -234,7 +213,7 @@ public class AliPayReq2 {
 		private Activity activity;
 
 		//未签名的订单信息
-		private String rawAliPayOrderInfo;
+//		private String rawAliPayOrderInfo;
 		//服务器签名成功的订单信息
 		private String signedAliPayOrderInfo;
 
@@ -253,10 +232,10 @@ public class AliPayReq2 {
 		 * @param rawAliPayOrderInfo
 		 * @return
 		 */
-		public Builder setRawAliPayOrderInfo(String rawAliPayOrderInfo){
-			this.rawAliPayOrderInfo = rawAliPayOrderInfo;
-			return this;
-		}
+//		public Builder setRawAliPayOrderInfo(String rawAliPayOrderInfo){
+//			this.rawAliPayOrderInfo = rawAliPayOrderInfo;
+//			return this;
+//		}
 
 		/**
 		 * 设置服务器签名成功的订单信息
@@ -271,7 +250,7 @@ public class AliPayReq2 {
 		public AliPayReq2 create(){
 			AliPayReq2 aliPayReq = new AliPayReq2();
 			aliPayReq.mActivity = this.activity;
-			aliPayReq.rawAliPayOrderInfo = this.rawAliPayOrderInfo;
+//			aliPayReq.rawAliPayOrderInfo = this.rawAliPayOrderInfo;
 			aliPayReq.signedAliPayOrderInfo = this.signedAliPayOrderInfo;
 
 			return aliPayReq;
